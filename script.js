@@ -1,4 +1,4 @@
-const d = document.getElementById('disagree');
+const d = document.getElementById('disagree'); 
 const a = document.getElementById('agree');
 const m = document.getElementById('modal');
 const c = document.getElementById('congrats');
@@ -26,55 +26,80 @@ a.onclick = () => {
 
 function l() {
     requestAnimationFrame(l);
-    t.fillStyle = 'rgba(0,0,0,0.2)';
+
+    // 比原本更淡，不會蓋掉煙火
+    t.fillStyle = 'rgba(0,0,0,0.08)';
     t.fillRect(0, 0, v.width, v.height);
-    
-    if (Math.random() < 0.05) {
+
+    // 發射煙火
+    if (Math.random() < 0.06) {
         f.push({
             x: Math.random() * v.width,
             y: v.height,
-            ty: Math.random() * v.height * 0.4,
-            v: Math.random() * 6 + 8,
+            ty: Math.random() * v.height * 0.6,
+            v: Math.random() * 5 + 7,
             c: `hsl(${Math.random() * 360}, 100%, 60%)`
         });
     }
-    
+
+    // 上升煙火
     for (let i = f.length - 1; i >= 0; i--) {
         let fw = f[i];
         fw.y -= fw.v;
+
         t.fillStyle = fw.c;
         t.beginPath();
         t.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
         t.fill();
-        
+
         if (fw.y <= fw.ty) {
-            for (let j = 0; j < 60; j++) {
+            // 爆炸
+            for (let j = 0; j < 70; j++) {
                 p.push({
                     x: fw.x,
                     y: fw.y,
-                    vx: (Math.random() - 0.5) * 15,
-                    vy: (Math.random() - 0.5) * 15,
-                    l: Math.random() * 30 + 50,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 80,
+                    alpha: 1,
                     c: fw.c
                 });
             }
             f.splice(i, 1);
         }
     }
-    
+
+    // 粒子
     for (let i = p.length - 1; i >= 0; i--) {
         let pt = p[i];
+
+        // 位置更新
         pt.x += pt.vx;
         pt.y += pt.vy;
-        pt.vy += 0.25;
-        pt.l--;
-        t.globalAlpha = Math.max(0, pt.l / 80);
+
+        // 阻力（重點）
+        pt.vx *= 0.98;
+        pt.vy *= 0.98;
+
+        // 重力
+        pt.vy += 0.2;
+
+        // 壽命
+        pt.life--;
+
+        // 透明度
+        pt.alpha = pt.life / 80;
+
+        t.globalAlpha = pt.alpha;
         t.fillStyle = pt.c;
         t.beginPath();
         t.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
         t.fill();
         t.globalAlpha = 1;
-        
-        if (pt.l <= 0) p.splice(i, 1);
+
+        // ✔ 真正刪掉（修復你說的問題）
+        if (pt.life <= 0 || pt.alpha <= 0.02) {
+            p.splice(i, 1);
+        }
     }
 }
