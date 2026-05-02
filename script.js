@@ -8,13 +8,13 @@ let p = [];
 let f = [];
 
 a.style.position = 'absolute';
-a.style.left = '30%';
-a.style.top = '50%';
+a.style.left = '40%';
+a.style.top = '55%';
 a.style.transform = 'translate(-50%, -50%)';
 
 d.style.position = 'absolute';
-d.style.left = '70%';
-d.style.top = '50%';
+d.style.left = '60%';
+d.style.top = '55%';
 d.style.transform = 'translate(-50%, -50%)';
 d.style.transition = 'all 0.3s ease-out';
 d.style.zIndex = '999';
