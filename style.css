@@ -1,15 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>告白網站</title>
+
+<style>
 body {
     margin: 0;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #000;
+    background: #000;
     color: #fff;
     font-family: sans-serif;
     overflow: hidden;
 }
 
+/* 主卡片 */
 .modal {
     background: #222;
     padding: 40px;
@@ -19,6 +28,7 @@ body {
     z-index: 10;
 }
 
+/* 按鈕 */
 .buttons {
     margin-top: 30px;
     display: flex;
@@ -35,30 +45,113 @@ body {
 }
 
 .agree {
-    background-color: #ff4d4d;
-    color: #fff;
+    background: #ff4d4d;
+    color: white;
 }
 
 .disagree {
-    background-color: #555;
-    color: #fff;
+    background: #555;
+    color: white;
 }
 
-.hidden {
-    display: none;
-}
-
+/* 成功畫面 */
 .congrats {
-    text-align: center;
-    z-index: 5;
+    position: absolute;
+    z-index: 10;
     display: none;
+    text-align: center;
 }
 
+/* canvas 煙火 */
 canvas {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
+    z-index: 1;
 }
+</style>
+</head>
+
+<body>
+
+<div class="modal" id="modal">
+    <h2>要不要跟我在一起？</h2>
+    <div class="buttons">
+        <button class="btn agree" id="agree">同意</button>
+        <button class="btn disagree" id="disagree">不要</button>
+    </div>
+</div>
+
+<div class="congrats" id="congrats">
+    <h1>成功啦 🎉</h1>
+    <p>恭喜你答應了</p>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<script>
+const d = document.getElementById('disagree');
+const a = document.getElementById('agree');
+const m = document.getElementById('modal');
+const c = document.getElementById('congrats');
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+
+let particles = [];
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* 煙火粒子 */
+function createFirework() {
+    for (let i = 0; i < 80; i++) {
+        particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            alpha: 1
+        });
+    }
+}
+
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.01;
+
+        ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+        ctx.fillRect(p.x, p.y, 3, 3);
+
+        if (p.alpha <= 0) particles.splice(i, 1);
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* 按鈕事件 */
+a.onclick = () => {
+    m.style.display = "none";
+    c.style.display = "block";
+    createFirework();
+};
+
+d.onclick = () => {
+    alert("不能拒絕 😏");
+};
+</script>
+
+</body>
+</html>
