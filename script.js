@@ -8,7 +8,7 @@ const t = v.getContext('2d');
 let p = [];
 let f = [];
 
-const MAX_PARTICLES = 600;
+let canSpawn = true;
 
 d.addEventListener('mouseover', () => {
     const x = Math.random() * (window.innerWidth - d.offsetWidth);
@@ -26,6 +26,20 @@ a.onclick = () => {
     l();
 };
 
+function spawnFirework() {
+    if (!canSpawn) return;
+
+    canSpawn = false;
+
+    f.push({
+        x: Math.random() * v.width,
+        y: v.height,
+        ty: Math.random() * v.height * 0.5,
+        v: Math.random() * 4 + 8,
+        c: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+}
+
 function l() {
     requestAnimationFrame(l);
 
@@ -34,14 +48,14 @@ function l() {
     t.fillRect(0, 0, v.width, v.height);
     t.globalCompositeOperation = 'lighter';
 
-    if (Math.random() < 0.04 && p.length < MAX_PARTICLES) {
-        f.push({
-            x: Math.random() * v.width,
-            y: v.height,
-            ty: Math.random() * v.height * 0.5,
-            v: Math.random() * 4 + 8,
-            c: `hsl(${Math.random() * 360}, 100%, 60%)`
-        });
+    if (f.length === 0 && canSpawn === false && p.length === 0) {
+        setTimeout(() => {
+            canSpawn = true;
+        }, 300);
+    }
+
+    if (Math.random() < 0.03) {
+        spawnFirework();
     }
 
     for (let i = f.length - 1; i >= 0; i--) {
@@ -52,13 +66,9 @@ function l() {
         t.fillRect(fw.x, fw.y, 2, 2);
 
         if (fw.y <= fw.ty) {
-            let count = 50;
-
-            for (let j = 0; j < count; j++) {
-                if (p.length >= MAX_PARTICLES) break;
-
+            for (let j = 0; j < 60; j++) {
                 let angle = Math.random() * Math.PI * 2;
-                let speed = Math.random() * 7 + 2;
+                let speed = Math.random() * 6 + 2;
 
                 p.push({
                     x: fw.x,
@@ -69,12 +79,9 @@ function l() {
                     c: fw.c
                 });
             }
-
             f.splice(i, 1);
         }
     }
-
-    t.beginPath();
 
     for (let i = p.length - 1; i >= 0; i--) {
         let pt = p[i];
@@ -85,9 +92,7 @@ function l() {
         pt.vx *= 0.985;
         pt.vy *= 0.985;
 
-        if (pt.life < 35) {
-            pt.vy += 0.05;
-        }
+        if (pt.life < 35) pt.vy += 0.05;
 
         pt.life--;
 
@@ -100,7 +105,6 @@ function l() {
 
         t.globalAlpha = alpha;
         t.fillStyle = pt.c;
-
         t.fillRect(pt.x, pt.y, 2, 2);
     }
 
