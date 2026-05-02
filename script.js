@@ -19,8 +19,10 @@ function resetButtons() {
     const mw = m.offsetWidth;
     const mh = m.offsetHeight;
 
-    d.style.left = mw * 0.65 + 'px';
-    d.style.top = mh * 0.5 + 'px';
+    const margin = 20;
+
+    d.style.left = margin + Math.random() * (mw - d.offsetWidth - margin) + 'px';
+    d.style.top = margin + Math.random() * (mh - d.offsetHeight - margin) + 'px';
 
     a.style.left = mw * 0.35 + 'px';
     a.style.top = mh * 0.5 + 'px';
@@ -31,15 +33,21 @@ resetButtons();
 d.addEventListener('mouseover', () => {
     const mw = m.offsetWidth;
     const mh = m.offsetHeight;
+    const margin = 20;
 
-    const x = Math.random() * (mw - d.offsetWidth);
-    const y = Math.random() * (mh - d.offsetHeight);
+    const x = margin + Math.random() * (mw - d.offsetWidth - margin);
+    const y = margin + Math.random() * (mh - d.offsetHeight - margin);
 
     d.style.left = x + 'px';
     d.style.top = y + 'px';
 });
 
+let lastMove = 0;
+
 document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastMove < 120) return;
+
     const rect = d.getBoundingClientRect();
     const dx = rect.x - e.clientX;
     const dy = rect.y - e.clientY;
@@ -52,6 +60,8 @@ document.addEventListener('mousemove', (e) => {
 
         d.style.left = x + 'px';
         d.style.top = y + 'px';
+
+        lastMove = now;
     }
 });
 
@@ -129,4 +139,7 @@ function loop() {
 
         if (pt.l <= 0) p.splice(i, 1);
     }
+
+    if (p.length > 800) p.splice(0, 200);
+    if (f.length > 50) f.splice(0, 10);
 }
