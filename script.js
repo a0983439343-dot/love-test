@@ -8,6 +8,8 @@ const t = v.getContext('2d');
 let p = [];
 let f = [];
 
+const MAX_PARTICLES = 600;
+
 d.addEventListener('mouseover', () => {
     const x = Math.random() * (window.innerWidth - d.offsetWidth);
     const y = Math.random() * (window.innerHeight - d.offsetHeight);
@@ -28,11 +30,11 @@ function l() {
     requestAnimationFrame(l);
 
     t.globalCompositeOperation = 'destination-out';
-    t.fillStyle = 'rgba(0,0,0,0.08)';
+    t.fillStyle = 'rgba(0,0,0,0.12)';
     t.fillRect(0, 0, v.width, v.height);
     t.globalCompositeOperation = 'lighter';
 
-    if (Math.random() < 0.08) {
+    if (Math.random() < 0.04 && p.length < MAX_PARTICLES) {
         f.push({
             x: Math.random() * v.width,
             y: v.height,
@@ -47,28 +49,32 @@ function l() {
         fw.y -= fw.v;
 
         t.fillStyle = fw.c;
-        t.beginPath();
-        t.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
-        t.fill();
+        t.fillRect(fw.x, fw.y, 2, 2);
 
         if (fw.y <= fw.ty) {
-            for (let j = 0; j < 80; j++) {
+            let count = 50;
+
+            for (let j = 0; j < count; j++) {
+                if (p.length >= MAX_PARTICLES) break;
+
                 let angle = Math.random() * Math.PI * 2;
-                let speed = Math.random() * 9 + 3;
+                let speed = Math.random() * 7 + 2;
 
                 p.push({
                     x: fw.x,
                     y: fw.y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
-                    life: 90,
-                    size: 3,
+                    life: 70,
                     c: fw.c
                 });
             }
+
             f.splice(i, 1);
         }
     }
+
+    t.beginPath();
 
     for (let i = p.length - 1; i >= 0; i--) {
         let pt = p[i];
@@ -79,31 +85,24 @@ function l() {
         pt.vx *= 0.985;
         pt.vy *= 0.985;
 
-        if (pt.life < 45) {
-            pt.vy += 0.06;
+        if (pt.life < 35) {
+            pt.vy += 0.05;
         }
 
         pt.life--;
 
-        let progress = pt.life / 90;
+        let alpha = pt.life / 70;
 
-        let alpha = progress;
-        let size = pt.size * progress;
+        if (alpha <= 0) {
+            p.splice(i, 1);
+            continue;
+        }
 
         t.globalAlpha = alpha;
         t.fillStyle = pt.c;
-        t.shadowBlur = 12;
-        t.shadowColor = pt.c;
 
-        t.beginPath();
-        t.arc(pt.x, pt.y, size, 0, Math.PI * 2);
-        t.fill();
-
-        t.shadowBlur = 0;
-        t.globalAlpha = 1;
-
-        if (pt.life <= 0 || alpha <= 0.03) {
-            p.splice(i, 1);
-        }
+        t.fillRect(pt.x, pt.y, 2, 2);
     }
+
+    t.globalAlpha = 1;
 }
