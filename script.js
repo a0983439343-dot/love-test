@@ -27,11 +27,9 @@ a.onclick = () => {
 function l() {
     requestAnimationFrame(l);
 
-    // 比原本更淡，不會蓋掉煙火
     t.fillStyle = 'rgba(0,0,0,0.08)';
     t.fillRect(0, 0, v.width, v.height);
 
-    // 發射煙火
     if (Math.random() < 0.06) {
         f.push({
             x: Math.random() * v.width,
@@ -42,7 +40,6 @@ function l() {
         });
     }
 
-    // 上升煙火
     for (let i = f.length - 1; i >= 0; i--) {
         let fw = f[i];
         fw.y -= fw.v;
@@ -53,15 +50,17 @@ function l() {
         t.fill();
 
         if (fw.y <= fw.ty) {
-            // 爆炸
             for (let j = 0; j < 70; j++) {
+                let angle = Math.random() * Math.PI * 2;
+                let speed = Math.random() * 6 + 2;
+
                 p.push({
                     x: fw.x,
                     y: fw.y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
                     life: 80,
-                    alpha: 1,
+                    size: 2.5,
                     c: fw.c
                 });
             }
@@ -69,36 +68,36 @@ function l() {
         }
     }
 
-    // 粒子
     for (let i = p.length - 1; i >= 0; i--) {
         let pt = p[i];
 
-        // 位置更新
         pt.x += pt.vx;
         pt.y += pt.vy;
 
-        // 阻力（重點）
         pt.vx *= 0.98;
         pt.vy *= 0.98;
 
-        // 重力
-        pt.vy += 0.2;
+        if (pt.life < 60) {
+            pt.vy += 0.1;
+        }
 
-        // 壽命
         pt.life--;
 
-        // 透明度
-        pt.alpha = pt.life / 80;
+        let progress = pt.life / 80;
 
-        t.globalAlpha = pt.alpha;
+        let alpha = progress;
+        let size = pt.size * progress;
+
+        t.globalAlpha = alpha;
         t.fillStyle = pt.c;
+
         t.beginPath();
-        t.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+        t.arc(pt.x, pt.y, size, 0, Math.PI * 2);
         t.fill();
+
         t.globalAlpha = 1;
 
-        // ✔ 真正刪掉（修復你說的問題）
-        if (pt.life <= 0 || pt.alpha <= 0.02) {
+        if (pt.life <= 0 || alpha <= 0.02) {
             p.splice(i, 1);
         }
     }
