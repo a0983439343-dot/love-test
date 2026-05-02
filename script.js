@@ -27,15 +27,17 @@ a.onclick = () => {
 function l() {
     requestAnimationFrame(l);
 
+    t.globalCompositeOperation = 'destination-out';
     t.fillStyle = 'rgba(0,0,0,0.08)';
     t.fillRect(0, 0, v.width, v.height);
+    t.globalCompositeOperation = 'lighter';
 
-    if (Math.random() < 0.06) {
+    if (Math.random() < 0.08) {
         f.push({
             x: Math.random() * v.width,
             y: v.height,
-            ty: Math.random() * v.height * 0.6,
-            v: Math.random() * 5 + 7,
+            ty: Math.random() * v.height * 0.5,
+            v: Math.random() * 4 + 8,
             c: `hsl(${Math.random() * 360}, 100%, 60%)`
         });
     }
@@ -50,17 +52,17 @@ function l() {
         t.fill();
 
         if (fw.y <= fw.ty) {
-            for (let j = 0; j < 70; j++) {
+            for (let j = 0; j < 80; j++) {
                 let angle = Math.random() * Math.PI * 2;
-                let speed = Math.random() * 6 + 2;
+                let speed = Math.random() * 9 + 3;
 
                 p.push({
                     x: fw.x,
                     y: fw.y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
-                    life: 80,
-                    size: 2.5,
+                    life: 90,
+                    size: 3,
                     c: fw.c
                 });
             }
@@ -74,30 +76,33 @@ function l() {
         pt.x += pt.vx;
         pt.y += pt.vy;
 
-        pt.vx *= 0.98;
-        pt.vy *= 0.98;
+        pt.vx *= 0.985;
+        pt.vy *= 0.985;
 
-        if (pt.life < 60) {
-            pt.vy += 0.1;
+        if (pt.life < 45) {
+            pt.vy += 0.06;
         }
 
         pt.life--;
 
-        let progress = pt.life / 80;
+        let progress = pt.life / 90;
 
         let alpha = progress;
         let size = pt.size * progress;
 
         t.globalAlpha = alpha;
         t.fillStyle = pt.c;
+        t.shadowBlur = 12;
+        t.shadowColor = pt.c;
 
         t.beginPath();
         t.arc(pt.x, pt.y, size, 0, Math.PI * 2);
         t.fill();
 
+        t.shadowBlur = 0;
         t.globalAlpha = 1;
 
-        if (pt.life <= 0 || alpha <= 0.02) {
+        if (pt.life <= 0 || alpha <= 0.03) {
             p.splice(i, 1);
         }
     }
